@@ -137,7 +137,7 @@ impl LayerAndMaskInformationSection {
         // group and layer counter
         let mut order_id: i32 = 0;
 
-        let mut names: HashMap<String, String> = HashMap::new();
+        let mut names: HashMap<String, u32> = HashMap::new();
 
         // Read each layer's channel image data
         for (layer_record, channels) in layer_records.into_iter() {
@@ -187,7 +187,6 @@ impl LayerAndMaskInformationSection {
                 }
 
                 _ => {
-                    
                     let psd_layer = LayerAndMaskInformationSection::read_layer(
                         &layer_record,
                         current_group_id,
@@ -196,11 +195,11 @@ impl LayerAndMaskInformationSection {
                         order_id,
                     )?;
 
-                    if names.contains_key(psd_layer.name.as_str()) {
+                    if names.contains_key(&layer_record.name.clone()) {
                         continue;
                     }
                     layers.push(psd_layer.name.clone(), psd_layer);
-                    names.insert(psd_layer.name.clone(), psd_layer.name.clone());
+                    names.insert(layer_record.name.clone(), 0);
                     order_id = order_id + 1;
                 }
             };
