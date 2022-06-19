@@ -180,6 +180,7 @@ impl LayerAndMaskInformationSection {
                         },
                         order_id,
                     ));
+                    order_id = order_id + 1;
                 }
 
                 _ => {
@@ -190,12 +191,12 @@ impl LayerAndMaskInformationSection {
                         channels,
                         order_id,
                     )?;
-
                     layers.push(psd_layer.name.clone(), psd_layer);
+                    order_id = order_id + 1;
                 }
             };
 
-            order_id = order_id + 1;
+            
         }
 
         Ok(LayerAndMaskInformationSection { layers, groups })
