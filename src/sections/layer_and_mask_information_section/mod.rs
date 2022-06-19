@@ -169,7 +169,7 @@ impl LayerAndMaskInformationSection {
                         end: layers.len(),
                     };
 
-                    if !names.contains_key(&*layer_record.name) {
+                    if names.contains_key(&*layer_record.name) {
                         continue
                     }
                     
@@ -192,7 +192,7 @@ impl LayerAndMaskInformationSection {
                 }
 
                 _ => {
-                    if !names.contains_key(&*layer_record.name) {
+                    if names.contains_key(&*layer_record.name) {
                         continue
                     }
                     let psd_layer = LayerAndMaskInformationSection::read_layer(
