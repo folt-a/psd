@@ -136,12 +136,12 @@ impl LayerAndMaskInformationSection {
 
         // group and layer counter
         let mut order_id: i32 = 0;
-        
-        let mut names:HashMap<String,i32> = HashMap::new();
+
+        let mut names: HashMap<String, String> = HashMap::new();
 
         // Read each layer's channel image data
         for (layer_record, channels) in layer_records.into_iter() {
-            
+
             // get current group from stack
             let current_group_id = stack.last().unwrap().group_id;
 
@@ -169,10 +169,6 @@ impl LayerAndMaskInformationSection {
                         end: layers.len(),
                     };
 
-                    if names.contains_key(&*layer_record.name) {
-                        continue
-                    }
-                    
                     groups.push(PsdGroup::new(
                         frame.name,
                         frame.group_id,
@@ -187,14 +183,11 @@ impl LayerAndMaskInformationSection {
                         },
                         order_id,
                     ));
-                    names.insert(layer_record.name.clone(),0);
                     order_id = order_id + 1;
                 }
 
                 _ => {
-                    if names.contains_key(&*layer_record.name) {
-                        continue
-                    }
+                    
                     let psd_layer = LayerAndMaskInformationSection::read_layer(
                         &layer_record,
                         current_group_id,
@@ -202,13 +195,15 @@ impl LayerAndMaskInformationSection {
                         channels,
                         order_id,
                     )?;
+
+                    if names.contains_key(psd_layer.name.as_str()) {
+                        continue;
+                    }
                     layers.push(psd_layer.name.clone(), psd_layer);
-                    names.insert(layer_record.name.clone(),0);
+                    names.insert(psd_layer.name.clone(), psd_layer.name.clone());
                     order_id = order_id + 1;
                 }
             };
-
-            
         }
 
         Ok(LayerAndMaskInformationSection { layers, groups })
