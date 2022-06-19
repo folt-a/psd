@@ -40,6 +40,8 @@ pub struct LayerProperties {
     pub(crate) blend_mode: BlendMode,
     /// If layer is nested, contains parent group ID, otherwise `None`
     pub(crate) group_id: Option<u32>,
+    /// order (both group and layer)
+    pub(crate) order_id: i32,
 }
 
 impl LayerProperties {
@@ -49,6 +51,7 @@ impl LayerProperties {
         psd_width: u32,
         psd_height: u32,
         group_id: Option<u32>,
+        order_id: i32,
     ) -> Self {
         LayerProperties {
             name,
@@ -63,6 +66,7 @@ impl LayerProperties {
             psd_width,
             psd_height,
             group_id,
+            order_id,
         }
     }
 
@@ -127,6 +131,10 @@ impl LayerProperties {
     pub fn parent_id(&self) -> Option<u32> {
         self.group_id
     }
+
+    pub fn order_id(&self) -> i32 {
+        self.order_id
+    }
 }
 
 /// PsdGroup represents a group of layers
@@ -150,9 +158,10 @@ impl PsdGroup {
         psd_width: u32,
         psd_height: u32,
         group_id: Option<u32>,
+        order_id: i32,
     ) -> Self {
         let layer_properties =
-            LayerProperties::from_layer_record(name, layer_record, psd_width, psd_height, group_id);
+            LayerProperties::from_layer_record(name, layer_record, psd_width, psd_height, group_id, order_id);
 
         PsdGroup {
             id,
@@ -197,7 +206,7 @@ pub struct PsdLayer {
 #[derive(Debug, PartialEq, Error)]
 pub enum PsdLayerError {
     #[error(
-        r#"Could not combine Red, Green, Blue and Alpha.
+    r#"Could not combine Red, Green, Blue and Alpha.
         This layer is missing channel: {channel:#?}"#
     )]
     MissingChannels { channel: PsdChannelKind },
@@ -217,6 +226,7 @@ impl PsdLayer {
         psd_height: u32,
         group_id: Option<u32>,
         channels: LayerChannels,
+        order_id: i32,
     ) -> PsdLayer {
         PsdLayer {
             layer_properties: LayerProperties::from_layer_record(
@@ -225,6 +235,7 @@ impl PsdLayer {
                 psd_width,
                 psd_height,
                 group_id,
+                order_id
             ),
             channels,
         }

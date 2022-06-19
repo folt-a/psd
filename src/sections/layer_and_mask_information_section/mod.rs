@@ -134,6 +134,9 @@ impl LayerAndMaskInformationSection {
         // Viewed group counter
         let mut already_viewed = 0;
 
+        // group and layer counter
+        let mut order_id: i32 = 0;
+
         // Read each layer's channel image data
         for (layer_record, channels) in layer_records.into_iter() {
             // get current group from stack
@@ -175,6 +178,7 @@ impl LayerAndMaskInformationSection {
                         } else {
                             None
                         },
+                        order_id,
                     ));
                 }
 
@@ -184,11 +188,14 @@ impl LayerAndMaskInformationSection {
                         current_group_id,
                         psd_size,
                         channels,
+                        order_id,
                     )?;
 
                     layers.push(psd_layer.name.clone(), psd_layer);
                 }
             };
+
+            order_id = order_id + 1;
         }
 
         Ok(LayerAndMaskInformationSection { layers, groups })
@@ -236,6 +243,7 @@ impl LayerAndMaskInformationSection {
         parent_id: u32,
         psd_size: (u32, u32),
         channels: LayerChannels,
+        order_id: i32,
     ) -> Result<PsdLayer, PsdLayerError> {
         Ok(PsdLayer::new(
             &layer_record,
@@ -243,6 +251,7 @@ impl LayerAndMaskInformationSection {
             psd_size.1,
             if parent_id > 0 { Some(parent_id) } else { None },
             channels,
+            order_id,
         ))
     }
 }
